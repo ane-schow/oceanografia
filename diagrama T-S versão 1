@@ -1,0 +1,51 @@
+import numpy as np
+from netCDF4 import Dataset
+import matplotlib.pyplot as plt
+import pandas as pd
+
+fn1 = 'C:/Users/DELL/Downloads/dados de oceanografia para programacao/ex 1 comparacao de diagrama ts/thetao jan20240000.nc'
+#var = open(fn1, 'r')
+#lines = var.readlines() tem cm coloca readline e fazer um loop p ficar mlh de ver
+dstemp = Dataset(fn1, 'r')
+#print("variáveis disponíveis:", dstemp.variables.keys())
+temp = 'thetao'
+temperatura = dstemp.variables[temp]
+prof = 'depth'
+profundidade = dstemp.variables[prof]
+
+##converter em array
+t = np.array(temperatura[:])
+p = np.array(profundidade[:]) # colocar antes ou dps de fechar o dataset
+#print(p[:])
+dstemp.close()
+## testar
+#print("Forma dos dados:", data1.shape)
+#print("Tipo dos dados:", data1.dtype)
+#print("Primeiros valores:", data1[:10])
+
+fn2 = 'C:/Users/DELL/Downloads/dados de oceanografia para programacao/ex 1 comparacao de diagrama ts/so jan20240000.nc'
+dssal = Dataset(fn2, 'r')
+#print("variáveis disponíveis:", dssal.variables.keys())
+sal = 'so'
+salinidade = dssal.variables[sal][:]
+dssal.close()
+s = np.array(salinidade[:])
+
+#juntando os três arrays em 1 so c três listas
+p1 = p.reshape(46, 1)
+s1 = s.reshape(46, 1)
+t1 = t.reshape(46, 1)
+data = np.hstack((s1, t1, p1))
+
+df = pd.DataFrame(data,
+            columns=['salinidade (PSU)', 'temperatura (C)', 'profundidade (m)'])
+ax1 = df.plot.scatter(x='salinidade (PSU)' ,
+                      y='temperatura (C)' ,
+                      c='DarkBlue')
+ax2 = df.plot.scatter(x='salinidade (PSU)' ,
+                      y='temperatura (C)' ,
+                      c='profundidade (m)' ,
+                      colormap='viridis')
+#Da onde q eu tirei o código de cima: https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.plot.scatter.html#pandas.DataFrame.plot.scatter
+plt.title('Diagrama T-S janeiro 2024')
+plt.show()
