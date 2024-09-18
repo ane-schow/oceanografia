@@ -1,0 +1,46 @@
+import numpy as np
+from netCDF4 import Dataset
+import matplotlib.pyplot as plt
+
+fn1 = 'C:/Users/DELL/Downloads/dados de oceanografia para programacao/ex 1 comparacao de diagrama ts/thetao jan20240000.nc'
+#var = open(fn1, 'r')
+#lines = var.readlines() tem cm coloca readline e fazer um loop p ficar mlh de ver
+dstemp = Dataset(fn1, 'r')
+#print("variáveis disponíveis:", dstemp.variables.keys())
+temp = 'thetao'
+temperatura = dstemp.variables[temp]
+prof = 'depth'
+profundidade = dstemp.variables[prof]
+
+##converter em array
+t = np.array(temperatura[:])
+p = np.array(profundidade[:])
+dstemp.close()
+## testar
+#print("Forma dos dados:", data1.shape)
+#print("Tipo dos dados:", data1.dtype)
+#print("Primeiros valores:", data1[:10])
+
+fn2 = 'C:/Users/DELL/Downloads/dados de oceanografia para programacao/ex 1 comparacao de diagrama ts/so jan20240000.nc'
+dssal = Dataset(fn2, 'r')
+#print("variáveis disponíveis:", dssal.variables.keys())
+sal = 'so'
+salinidade = dssal.variables[sal][:]
+dssal.close()
+s = np.array(salinidade[:])
+
+#juntando os três arrays em 1 so c três listas
+p1 = p.reshape(46, 1)
+s1 = s.reshape(46, 1)
+t1 = t.reshape(46, 1)
+
+fig,ax = plt.subplots(figsize=(10,8))
+scpl = ax.scatter(s1, t1, s=30, c=p1, alpha=0.5)
+ax.set_title('Diagrama T-S Janeiro de 2024', fontsize=18)
+ax.set_ylabel('Temperatura (C)', fontsize=14)
+ax.set_xlabel('Salinidade (PSU)', fontsize=14)
+ax.grid(linestyle='-.')
+c = fig.colorbar(scpl, ax=ax)
+c.set_label('Pressão (m)', fontsize=12)
+c.ax.invert_yaxis()
+plt.show()
